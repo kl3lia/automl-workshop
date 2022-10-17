@@ -1,0 +1,494 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "#authentication\r\n",
+        "from azureml.core.authentication import InteractiveLoginAuthentication\r\n",
+        "from azureml.core import Workspace\r\n",
+        "\r\n",
+        "ia = InteractiveLoginAuthentication(tenant_id='16b3c013-d300-468d-ac64-7eda0820b6d3')\r\n",
+        "\r\n",
+        "# You can find tenant id under azure active directory->properties\r\n",
+        "ws = Workspace.get(name='Prod',\r\n",
+        "                     subscription_id='fe38c376-b42a-4741-9e7c-f5d7c31e5873',\r\n",
+        "                     resource_group='ProdRG',auth=ia)"
+      ],
+      "outputs": [],
+      "execution_count": 1,
+      "metadata": {
+        "gather": {
+          "logged": 1665815806256
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## ** Create Tabular Dataset **"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#creates an unregistered TabularDataset from a WEB URL.\r\n",
+        "\r\n",
+        "from azureml.core.dataset import Dataset\r\n",
+        "\r\n",
+        "web_path ='https://dprepdata.blob.core.windows.net/demo/Titanic.csv'\r\n",
+        "titanic_ds = Dataset.Tabular.from_delimited_files(path=web_path)"
+      ],
+      "outputs": [],
+      "execution_count": 2,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1665815854246
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.data.datapath import DataPath\r\n",
+        "\r\n",
+        "datastore_name = ws.get_default_datastore()\r\n",
+        "Dataset.File.upload_directory(src_dir='Users/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data',\r\n",
+        "                              target=DataPath(datastore_name, 'weather_data/')\r\n",
+        "                              )\r\n",
+        "    "
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Validating arguments.\nArguments validated.\nUploading file to weather_data/\n"
+        },
+        {
+          "output_type": "error",
+          "ename": "UserErrorException",
+          "evalue": "UserErrorException:\n\tMessage: Source path for upload needs to be a directory.             Provided path for upload is Users/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data\n\tInnerException None\n\tErrorResponse \n{\n    \"error\": {\n        \"code\": \"UserError\",\n        \"message\": \"Source path for upload needs to be a directory.             Provided path for upload is Users/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data\"\n    }\n}",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mUserErrorException\u001b[0m                        Traceback (most recent call last)",
+            "Input \u001b[0;32mIn [15]\u001b[0m, in \u001b[0;36m<cell line: 4>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01mazureml\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mdata\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mdatapath\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m DataPath\n\u001b[1;32m      3\u001b[0m datastore_name \u001b[38;5;241m=\u001b[39m ws\u001b[38;5;241m.\u001b[39mget_default_datastore()\n\u001b[0;32m----> 4\u001b[0m \u001b[43mDataset\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mFile\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mupload_directory\u001b[49m\u001b[43m(\u001b[49m\u001b[43msrc_dir\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[38;5;124;43mUsers/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data\u001b[39;49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[1;32m      5\u001b[0m \u001b[43m                              \u001b[49m\u001b[43mtarget\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mDataPath\u001b[49m\u001b[43m(\u001b[49m\u001b[43mdatastore_name\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[38;5;124;43mweather_data/\u001b[39;49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[1;32m      6\u001b[0m \u001b[43m                              \u001b[49m\u001b[43m)\u001b[49m\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/_loggerfactory.py:132\u001b[0m, in \u001b[0;36mtrack.<locals>.monitor.<locals>.wrapper\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m    130\u001b[0m \u001b[38;5;28;01mwith\u001b[39;00m _LoggerFactory\u001b[38;5;241m.\u001b[39mtrack_activity(logger, func\u001b[38;5;241m.\u001b[39m\u001b[38;5;18m__name__\u001b[39m, activity_type, custom_dimensions) \u001b[38;5;28;01mas\u001b[39;00m al:\n\u001b[1;32m    131\u001b[0m     \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[0;32m--> 132\u001b[0m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    133\u001b[0m     \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mException\u001b[39;00m \u001b[38;5;28;01mas\u001b[39;00m e:\n\u001b[1;32m    134\u001b[0m         \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(al, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mactivity_info\u001b[39m\u001b[38;5;124m'\u001b[39m) \u001b[38;5;129;01mand\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(e, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124merror_code\u001b[39m\u001b[38;5;124m'\u001b[39m):\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/dataset_factory.py:921\u001b[0m, in \u001b[0;36mFileDatasetFactory.upload_directory\u001b[0;34m(src_dir, target, pattern, overwrite, show_progress)\u001b[0m\n\u001b[1;32m    902\u001b[0m \u001b[38;5;129m@staticmethod\u001b[39m\n\u001b[1;32m    903\u001b[0m \u001b[38;5;129m@track\u001b[39m(_get_logger, custom_dimensions\u001b[38;5;241m=\u001b[39m{\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mapp_name\u001b[39m\u001b[38;5;124m'\u001b[39m: \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mFileDataset\u001b[39m\u001b[38;5;124m'\u001b[39m}, activity_type\u001b[38;5;241m=\u001b[39m_PUBLIC_API)\n\u001b[1;32m    904\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mupload_directory\u001b[39m(src_dir, target, pattern\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mNone\u001b[39;00m, overwrite\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mFalse\u001b[39;00m, show_progress\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mTrue\u001b[39;00m):\n\u001b[1;32m    905\u001b[0m     \u001b[38;5;124;03m\"\"\"Create a dataset from source directory.\u001b[39;00m\n\u001b[1;32m    906\u001b[0m \n\u001b[1;32m    907\u001b[0m \u001b[38;5;124;03m    :param src_dir: The local directory to upload.\u001b[39;00m\n\u001b[0;32m   (...)\u001b[0m\n\u001b[1;32m    919\u001b[0m \u001b[38;5;124;03m    :rtype: azureml.data.FileDataset\u001b[39;00m\n\u001b[1;32m    920\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[0;32m--> 921\u001b[0m     \u001b[43mFileDatasetFactory\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_upload_directory\u001b[49m\u001b[43m(\u001b[49m\u001b[43msrc_dir\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mtarget\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mpattern\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43moverwrite\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mshow_progress\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    922\u001b[0m     console \u001b[38;5;241m=\u001b[39m get_progress_logger(show_progress)\n\u001b[1;32m    923\u001b[0m     console(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mCreating new dataset\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/dataset_factory.py:945\u001b[0m, in \u001b[0;36mFileDatasetFactory._upload_directory\u001b[0;34m(src_dir, target, pattern, overwrite, show_progress)\u001b[0m\n\u001b[1;32m    943\u001b[0m console(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mUploading file to \u001b[39m\u001b[38;5;132;01m{}\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mformat(relative_path))\n\u001b[1;32m    944\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m pattern \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[0;32m--> 945\u001b[0m     \u001b[43mupload_dir\u001b[49m\u001b[43m(\u001b[49m\u001b[43msrc_dir\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mrelative_path\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mdatastore\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43moverwrite\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43moverwrite\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mshow_progress\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mshow_progress\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    946\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[1;32m    947\u001b[0m     console(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mFiltering files with pattern matching \u001b[39m\u001b[38;5;132;01m{}\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mformat(pattern))\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/_dataprep_helper.py:190\u001b[0m, in \u001b[0;36mupload_dir\u001b[0;34m(src_dir, remote_target_path, datastore, overwrite, show_progress, continue_on_failure)\u001b[0m\n\u001b[1;32m    187\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m overwrite:\n\u001b[1;32m    188\u001b[0m     file_exists_fn(dstore\u001b[38;5;241m=\u001b[39mdatastore, path\u001b[38;5;241m=\u001b[39mremote_target_path)\n\u001b[1;32m    189\u001b[0m _start_upload_task(\n\u001b[0;32m--> 190\u001b[0m     \u001b[43m_get_upload_from_dir\u001b[49m\u001b[43m(\u001b[49m\u001b[43msrc_dir\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mremote_target_path\u001b[49m\u001b[43m)\u001b[49m,\n\u001b[1;32m    191\u001b[0m     overwrite,\n\u001b[1;32m    192\u001b[0m     \u001b[38;5;28;01mlambda\u001b[39;00m target_file_path: file_exists_fn(dstore\u001b[38;5;241m=\u001b[39mdatastore, path\u001b[38;5;241m=\u001b[39mtarget_file_path),\n\u001b[1;32m    193\u001b[0m     show_progress,\n\u001b[1;32m    194\u001b[0m     \u001b[38;5;28;01mlambda\u001b[39;00m target, source: \u001b[38;5;28;01mlambda\u001b[39;00m: _upload_file(base_path\u001b[38;5;241m=\u001b[39msrc_dir, local_file_path\u001b[38;5;241m=\u001b[39msource,\n\u001b[1;32m    195\u001b[0m                                                 remote_target_path\u001b[38;5;241m=\u001b[39mremote_target_path, datastore\u001b[38;5;241m=\u001b[39mdatastore,\n\u001b[1;32m    196\u001b[0m                                                 overwrite\u001b[38;5;241m=\u001b[39moverwrite),\n\u001b[1;32m    197\u001b[0m     continue_on_failure\n\u001b[1;32m    198\u001b[0m )\n\u001b[1;32m    199\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m DataReference(datastore\u001b[38;5;241m=\u001b[39mdatastore, path_on_datastore\u001b[38;5;241m=\u001b[39mremote_target_path)\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/_upload_helper.py:59\u001b[0m, in \u001b[0;36m_get_upload_from_dir\u001b[0;34m(src_path, target_path)\u001b[0m\n\u001b[1;32m     57\u001b[0m src_path \u001b[38;5;241m=\u001b[39m src_path\u001b[38;5;241m.\u001b[39mrstrip(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m/\u001b[39m\u001b[38;5;130;01m\\\\\u001b[39;00m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m     58\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m os\u001b[38;5;241m.\u001b[39mpath\u001b[38;5;241m.\u001b[39misdir(src_path):\n\u001b[0;32m---> 59\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m UserErrorException(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mSource path for upload needs to be a directory.\u001b[39m\u001b[38;5;130;01m\\\u001b[39;00m\n\u001b[1;32m     60\u001b[0m \u001b[38;5;124m         Provided path for upload is \u001b[39m\u001b[38;5;132;01m{}\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mformat(src_path))\n\u001b[1;32m     62\u001b[0m paths_to_upload \u001b[38;5;241m=\u001b[39m []\n\u001b[1;32m     63\u001b[0m \u001b[38;5;28;01mfor\u001b[39;00m dirpath, dirnames, filenames \u001b[38;5;129;01min\u001b[39;00m os\u001b[38;5;241m.\u001b[39mwalk(src_path):\n",
+            "\u001b[0;31mUserErrorException\u001b[0m: UserErrorException:\n\tMessage: Source path for upload needs to be a directory.             Provided path for upload is Users/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data\n\tInnerException None\n\tErrorResponse \n{\n    \"error\": {\n        \"code\": \"UserError\",\n        \"message\": \"Source path for upload needs to be a directory.             Provided path for upload is Users/yelizkilinc/automl-workshop/Data Basics/workshop_examples/weather-data\"\n    }\n}"
+          ]
+        }
+      ],
+      "execution_count": 15,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1665835646953
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#creates an unregistered TabularDataset from a DATASTORE\r\n",
+        "\r\n",
+        "from azureml.core import Workspace, Datastore, Dataset\r\n",
+        "\r\n",
+        "datastore_name = ws.get_default_datastore()\r\n",
+        "weather_ds = 'weather-data-florida'\r\n",
+        "\r\n",
+        "#load data to blob storage from local folder (weather-data) to be able to create a dataset\r\n",
+        "datastore_name.upload('weather_data', weather_ds, overwrite=True, show_progress=True)\r\n",
+        "\r\n",
+        "datastore_path = [(datastore_name, weather_ds + '/*/*/data.parquet')]\r\n",
+        "dataset        = Dataset.Tabular.from_parquet_files(path=datastore_path, partition_format = weather_ds + '/{partition_time:yyyy/MM}/data.parquet')\r\n",
+        "\r\n",
+        "#Assign \"datetime\" column as timestamp and \"partition_time\" from folder path as partition_timestamp for Tabular Dataset to activate Time Series related APIs. The column to be assigned should be a Date type.\r\n",
+        "tsd = dataset.with_timestamp_columns(timestamp='datetime', partition_timestamp='partition_time')\r\n",
+        "\r\n",
+        "# register dataset to Workspace\r\n",
+        "registered_ds = tsd.register(ws, weather_ds, create_new_version=True, description='Data for Tabular Dataset- time-series.', tags={ 'type': 'TabularDataset' })\r\n",
+        "\r\n",
+        "#weather_ds = Dataset.Tabular.from_delimited_files(path=datastore_paths)"
+      ],
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "UserErrorException",
+          "evalue": "UserErrorException:\n\tMessage: src_path must be a directory.\n\tInnerException None\n\tErrorResponse \n{\n    \"error\": {\n        \"code\": \"UserError\",\n        \"message\": \"src_path must be a directory.\"\n    }\n}",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mUserErrorException\u001b[0m                        Traceback (most recent call last)",
+            "Input \u001b[0;32mIn [16]\u001b[0m, in \u001b[0;36m<cell line: 9>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      6\u001b[0m weather_ds \u001b[38;5;241m=\u001b[39m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mweather-data-florida\u001b[39m\u001b[38;5;124m'\u001b[39m\n\u001b[1;32m      8\u001b[0m \u001b[38;5;66;03m#load data to blob storage from local folder (weather-data) to be able to create a dataset\u001b[39;00m\n\u001b[0;32m----> 9\u001b[0m \u001b[43mdatastore_name\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mupload\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[38;5;124;43mweather_data\u001b[39;49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mweather_ds\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43moverwrite\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mshow_progress\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m)\u001b[49m\n\u001b[1;32m     11\u001b[0m datastore_path \u001b[38;5;241m=\u001b[39m [(datastore_name, weather_ds \u001b[38;5;241m+\u001b[39m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124m/*/*/data.parquet\u001b[39m\u001b[38;5;124m'\u001b[39m)]\n\u001b[1;32m     12\u001b[0m dataset        \u001b[38;5;241m=\u001b[39m Dataset\u001b[38;5;241m.\u001b[39mTabular\u001b[38;5;241m.\u001b[39mfrom_parquet_files(path\u001b[38;5;241m=\u001b[39mdatastore_path, partition_format \u001b[38;5;241m=\u001b[39m weather_ds \u001b[38;5;241m+\u001b[39m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124m/\u001b[39m\u001b[38;5;124m{\u001b[39m\u001b[38;5;124mpartition_time:yyyy/MM}/data.parquet\u001b[39m\u001b[38;5;124m'\u001b[39m)\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/_dataset_deprecation.py:26\u001b[0m, in \u001b[0;36mdeprecated.<locals>.monitor.<locals>.wrapper\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m     24\u001b[0m     _warn_deprecation(target, replacement)  \u001b[38;5;66;03m# only raise warning for top-level invocation\u001b[39;00m\n\u001b[1;32m     25\u001b[0m     _warning_silenced_for \u001b[38;5;241m=\u001b[39m target\n\u001b[0;32m---> 26\u001b[0m result \u001b[38;5;241m=\u001b[39m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m     27\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m _warning_silenced_for \u001b[38;5;241m==\u001b[39m target:\n\u001b[1;32m     28\u001b[0m     _warning_silenced_for \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;01mNone\u001b[39;00m\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/azure_storage_datastore.py:793\u001b[0m, in \u001b[0;36mAzureBlobDatastore.upload\u001b[0;34m(self, src_dir, target_path, overwrite, show_progress)\u001b[0m\n\u001b[1;32m    790\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_ensure_credential(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mUpload\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m    791\u001b[0m target_path \u001b[38;5;241m=\u001b[39m target_path \u001b[38;5;129;01mor\u001b[39;00m \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m\"\u001b[39m\n\u001b[1;32m    792\u001b[0m count \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_start_upload_task(\n\u001b[0;32m--> 793\u001b[0m     \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_get_upload_from_dir\u001b[49m\u001b[43m(\u001b[49m\u001b[43msrc_dir\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mtarget_path\u001b[49m\u001b[43m)\u001b[49m,\n\u001b[1;32m    794\u001b[0m     overwrite,\n\u001b[1;32m    795\u001b[0m     \u001b[38;5;28;01mlambda\u001b[39;00m target_file_path: \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mblob_service\u001b[38;5;241m.\u001b[39mexists(\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mcontainer_name, target_file_path),\n\u001b[1;32m    796\u001b[0m     show_progress,\n\u001b[1;32m    797\u001b[0m     \u001b[38;5;28;01mlambda\u001b[39;00m target, source: \u001b[38;5;28;01mlambda\u001b[39;00m: \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mblob_service\u001b[38;5;241m.\u001b[39mcreate_blob_from_path(\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mcontainer_name, target, source)\n\u001b[1;32m    798\u001b[0m )\n\u001b[1;32m    799\u001b[0m module_logger\u001b[38;5;241m.\u001b[39minfo(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mFinished AzureBlobDatastore.upload with count=\u001b[39m\u001b[38;5;132;01m{0}\u001b[39;00m\u001b[38;5;124m.\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mformat(count))\n\u001b[1;32m    800\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m DataReference(datastore\u001b[38;5;241m=\u001b[39m\u001b[38;5;28mself\u001b[39m, path_on_datastore\u001b[38;5;241m=\u001b[39mtarget_path)\n",
+            "File \u001b[0;32m/anaconda/envs/azureml_py38/lib/python3.8/site-packages/azureml/data/azure_storage_datastore.py:270\u001b[0m, in \u001b[0;36mAbstractAzureStorageDatastore._get_upload_from_dir\u001b[0;34m(self, src_path, target_path)\u001b[0m\n\u001b[1;32m    268\u001b[0m src_path \u001b[38;5;241m=\u001b[39m src_path\u001b[38;5;241m.\u001b[39mrstrip(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m/\u001b[39m\u001b[38;5;130;01m\\\\\u001b[39;00m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m    269\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m os\u001b[38;5;241m.\u001b[39mpath\u001b[38;5;241m.\u001b[39misdir(src_path):\n\u001b[0;32m--> 270\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m UserErrorException(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124msrc_path must be a directory.\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m    272\u001b[0m paths_to_upload \u001b[38;5;241m=\u001b[39m []\n\u001b[1;32m    273\u001b[0m \u001b[38;5;28;01mfor\u001b[39;00m dirpath, dirnames, filenames \u001b[38;5;129;01min\u001b[39;00m os\u001b[38;5;241m.\u001b[39mwalk(src_path):\n",
+            "\u001b[0;31mUserErrorException\u001b[0m: UserErrorException:\n\tMessage: src_path must be a directory.\n\tInnerException None\n\tErrorResponse \n{\n    \"error\": {\n        \"code\": \"UserError\",\n        \"message\": \"src_path must be a directory.\"\n    }\n}"
+          ]
+        }
+      ],
+      "execution_count": 16,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1665835684843
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### **Example for how to use unregistered dataset in the training script**"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "'''import os\r\n",
+        "# Create a folder for the script files\r\n",
+        "script_folder = 'workshop_examples'\r\n",
+        "os.makedirs(script_folder, exist_ok=True)\r\n",
+        "\r\n",
+        "print(script_folder)'''"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "workshop_examples\n"
+        }
+      ],
+      "execution_count": 8,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1665816985816
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "'''\r\n",
+        "%%writefile $script_folder/train_titanic.py\r\n",
+        "#access data in training script\r\n",
+        "\r\n",
+        "import argparse\r\n",
+        "from azureml.core import Dataset, Run\r\n",
+        "\r\n",
+        "parser = argparse.ArgumentParser()\r\n",
+        "parser.add_argument(\"--input-data\", type=str)\r\n",
+        "args = parser.parse_args()\r\n",
+        "\r\n",
+        "run = Run.get_context()\r\n",
+        "ws = run.experiment.workspace\r\n",
+        "\r\n",
+        "# get the input dataset by ID\r\n",
+        "dataset = Dataset.get_by_id(ws, id=args.input_data)\r\n",
+        "\r\n",
+        "# load the TabularDataset to pandas DataFrame\r\n",
+        "df = dataset.to_pandas_dataframe()\r\n",
+        "'''"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Overwriting workshop_examples/train_titanic.py\n"
+        }
+      ],
+      "execution_count": 9,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "'''\r\n",
+        "# define compute target, add the code\r\n",
+        "# define environment as myenv., add the code\r\n",
+        "from azureml.core import ScriptRunConfig\r\n",
+        "\r\n",
+        "src = ScriptRunConfig(source_directory=script_folder,\r\n",
+        "                      script='train_titanic.py',\r\n",
+        "                      # pass dataset as an input with friendly name 'titanic'\r\n",
+        "                      arguments=['--input-data', titanic_ds.as_named_input('titanic')],\r\n",
+        "                      compute_target=compute_target,\r\n",
+        "                      environment=myenv)\r\n",
+        "                             \r\n",
+        "# Submit the run configuration for your training run\r\n",
+        "run = experiment.submit(src)\r\n",
+        "run.wait_for_completion(show_output=True)\r\n",
+        "'''"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 10,
+          "data": {
+            "text/plain": "\"\\nfrom azureml.core import ScriptRunConfig\\n\\nsrc = ScriptRunConfig(source_directory=script_folder,\\n                      script='train_titanic.py',\\n                      # pass dataset as an input with friendly name 'titanic'\\n                      arguments=['--input-data', titanic_ds.as_named_input('titanic')],\\n                      compute_target=compute_target,\\n                      environment=myenv)\\n                             \\n# Submit the run configuration for your training run\\nrun = experiment.submit(src)\\nrun.wait_for_completion(show_output=True)\\n\""
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 10,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1665817922909
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Create File Dataset **"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core.dataset import Dataset\r\n",
+        "\r\n",
+        "web_paths = [\r\n",
+        "            'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz',\r\n",
+        "            'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz',\r\n",
+        "            'http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz',\r\n",
+        "            'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz'\r\n",
+        "            ]\r\n",
+        "\r\n",
+        "mnist_ds = Dataset.File.from_files(path = web_paths)"
+      ],
+      "outputs": [],
+      "execution_count": null,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Create datasets from datastores**"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## REGISTER DATASETS"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Register dataset\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "dataset = Dataset.get_by_name(workspace, name='AutoMLE2EPipeline_Classification_train')\r\n",
+        "data=dataset.take(100).to_pandas_dataframe()\r\n",
+        "\r\n",
+        "test = TabularDatasetFactory.register_pandas_dataframe(\r\n",
+        "    data, target=(datastore, \"dataset/\"), name=\"AutoMLE2EPipeline_Classification_test\")"
+      ],
+      "outputs": [],
+      "execution_count": null,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "** Access registered datasets **"
+      ],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "dataset_name = 'titanic_ds'\r\n",
+        "\r\n",
+        "# Get a dataset by name\r\n",
+        "titanic_ds = Dataset.get_by_name(workspace=workspace, name=dataset_name)\r\n",
+        "#returns the latest version of the dataset"
+      ],
+      "outputs": [],
+      "execution_count": null,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python38-azureml",
+      "language": "python",
+      "display_name": "Python 3.8 - AzureML"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.8.5",
+      "mimetype": "text/x-python",
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "pygments_lexer": "ipython3",
+      "nbconvert_exporter": "python",
+      "file_extension": ".py"
+    },
+    "kernel_info": {
+      "name": "python38-azureml"
+    },
+    "microsoft": {
+      "host": {
+        "AzureML": {
+          "notebookHasBeenCompleted": true
+        }
+      }
+    },
+    "nteract": {
+      "version": "nteract-front-end@1.0.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}
